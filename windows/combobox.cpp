@@ -68,7 +68,7 @@ void uiComboboxAppend(uiCombobox *c, const char *text)
 	WCHAR *wtext;
 	LRESULT res;
 
-	wtext = toUTF16(text);
+	wtext = toUTF16_win(text);
 	res = SendMessageW(c->hwnd, CB_ADDSTRING, 0, (LPARAM) wtext);
 	if (res == (LRESULT) CB_ERR)
 		logLastError(L"error appending item to uiCombobox");

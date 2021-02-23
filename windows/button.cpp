@@ -89,7 +89,7 @@ uiButton *uiNewButton(const char *text)
 
 	uiWindowsNewControl(uiButton, b);
 
-	wtext = toUTF16(text);
+	wtext = toUTF16_win(text);
 	b->hwnd = uiWindowsEnsureCreateControlHWND(0,
 		L"button", wtext,
 		BS_PUSHBUTTON | WS_TABSTOP,

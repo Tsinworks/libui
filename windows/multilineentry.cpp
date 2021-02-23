@@ -94,7 +94,7 @@ void uiMultilineEntryAppend(uiMultilineEntry *e, const char *text)
 	n = SendMessageW(e->hwnd, WM_GETTEXTLENGTH, 0, 0);
 	SendMessageW(e->hwnd, EM_SETSEL, n, n);
 	crlf = LFtoCRLF(text);
-	wtext = toUTF16(crlf);
+	wtext = toUTF16_win(crlf);
 	uiprivFree(crlf);
 	SendMessageW(e->hwnd, EM_REPLACESEL, FALSE, (LPARAM) wtext);
 	uiprivFree(wtext);

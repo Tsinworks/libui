@@ -102,7 +102,7 @@ uiCheckbox *uiNewCheckbox(const char *text)
 
 	uiWindowsNewControl(uiCheckbox, c);
 
-	wtext = toUTF16(text);
+	wtext = toUTF16_win(text);
 	c->hwnd = uiWindowsEnsureCreateControlHWND(0,
 		L"button", wtext,
 		BS_CHECKBOX | WS_TABSTOP,

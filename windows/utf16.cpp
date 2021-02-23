@@ -23,6 +23,35 @@ WCHAR *toUTF16(const char *str)
 	return wstr;
 }
 
+WCHAR *toUTF16_win(const char *str)
+{
+	WCHAR *wstr;
+	WCHAR *wp;
+	size_t n;
+	uint32_t rune;
+
+	if(!str)
+		return nullptr;
+	if (*str == '\0')			// empty string
+		return emptyUTF16();
+	size_t olen = strlen(str);
+	static auto acp = GetACP();
+  	size_t charsNeeded = ::MultiByteToWideChar(acp, 0, str, (int)olen, NULL, 0);
+  	if (charsNeeded == 0)
+    	return emptyUTF16();
+	wstr = (WCHAR *) uiprivAlloc((charsNeeded + 1) * sizeof (WCHAR), "WCHAR[]");
+	wp = wstr;
+
+  	int charsConverted = ::MultiByteToWideChar(acp, 0, str, (int)olen, wstr,
+                                             charsNeeded);
+
+	if (charsConverted == 0) {
+		uiprivFree(wstr);
+		return emptyUTF16();
+	}
+	return wstr;
+}
+
 char *toUTF8(const WCHAR *wstr)
 {
 	char *str;

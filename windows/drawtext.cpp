@@ -40,7 +40,7 @@ uiDrawTextLayout *uiDrawNewTextLayout(uiDrawTextLayoutParams *p)
 
 	tl = uiprivNew(uiDrawTextLayout);
 
-	wDefaultFamily = toUTF16(p->DefaultFont->Family);
+	wDefaultFamily = toUTF16_win(p->DefaultFont->Family);
 	hr = dwfactory->CreateTextFormat(
 		wDefaultFamily, NULL,
 		uiprivWeightToDWriteWeight(p->DefaultFont->Weight),
