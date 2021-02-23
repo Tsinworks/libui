@@ -91,6 +91,30 @@ void uiComboboxSetSelected(uiCombobox *c, int n)
 	[c->pb selectItemAtIndex:n];
 }
 
+void uiComboboxReset(uiCombobox *c)
+{
+	[c->pb removeAllItems];
+	if(c->pbac != nil)
+	{
+		[c->pbac release];
+		[c->pb unbind:@"contentObjects"];
+		[c->pb unbind:@"selectedIndex"];
+	}
+	c->pbac = [NSArrayController new];
+	[c->pbac setAvoidsEmptySelection:NO];
+	[c->pbac setSelectsInsertedObjects:NO];
+	[c->pbac setAutomaticallyRearrangesObjects:NO];
+	[c->pb bind:@"contentValues"
+		toObject:c->pbac
+		withKeyPath:@"arrangedObjects"
+		options:nil];
+	[c->pb bind:@"selectedIndex"
+		toObject:c->pbac
+		withKeyPath:@"selectionIndex"
+		options:nil];
+
+}
+
 void uiComboboxOnSelected(uiCombobox *c, void (*f)(uiCombobox *c, void *data), void *data)
 {
 	c->onSelected = f;
