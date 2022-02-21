@@ -20,6 +20,8 @@ struct uiWindow {
 	int fullscreen;
 	WINDOWPLACEMENT fsPrevPlacement;
 	int borderless;
+	void (*onTrayEvent)(uiWindow*, void*, uiTrayEvent, WPARAM);
+	void* onTrayEventData;
 };
 
 // from https://msdn.microsoft.com/en-us/library/windows/desktop/dn742486.aspx#sizingandspacing
@@ -120,6 +122,27 @@ static LRESULT CALLBACK windowWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 		if ((*(w->onClosing))(w, w->onClosingData))
 			uiControlDestroy(uiControl(w));
 		return 0;		// we destroyed it already
+	case msgTRAY:
+		if (w->onTrayEvent != NULL)
+		{
+			uiTrayEvent e = uiTrayNone;
+			switch (LOWORD(lParam))
+			{
+			case WM_LBUTTONDBLCLK:
+			case NIN_SELECT:
+				e = uiTraySelect;
+				break;
+			case WM_RBUTTONUP:
+			case WM_CONTEXTMENU:
+				e = uiTrayMenu;
+				break;
+			}
+			if (e != uiTrayNone)
+			{
+				(*(w->onTrayEvent))(w, w->onTrayEventData, e, wParam);
+			}
+		}
+		return 0;
 	}
 	return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 }
@@ -533,4 +556,33 @@ void enableAllWindowsExcept(uiWindow *which)
 			continue;
 		EnableWindow(w.first->hwnd, TRUE);
 	}
+}
+
+#pragma comment(lib, "Shell32.lib")
+
+void uiWindowAddTray(uiWindow* c, uiTrayDesc* tray)
+{
+	if (tray)
+	{
+		c->onTrayEvent = tray->onTrayEvent;
+		c->onTrayEventData = tray->data;
+		NOTIFYICONDATAW nid = { sizeof(nid) };
+		nid.hWnd = (HWND)uiWindowHandle(uiControl(c));
+		nid.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE | NIF_SHOWTIP;
+		nid.uCallbackMessage = msgTRAY;
+		nid.hIcon = tray->icon;
+		nid.uID = tray->uid;
+		wcscpy_s(nid.szTip, tray->tip);
+		wcscpy_s(nid.szInfoTitle, tray->title);
+		Shell_NotifyIconW(NIM_ADD, &nid);
+	}
+}
+
+void uiWindowDeleteTray(uiWindow* c, UINT uid)
+{
+	c->onTrayEvent = NULL;
+	c->onTrayEventData = NULL;
+	NOTIFYICONDATAW nid = { sizeof(nid) };
+	nid.uID = uid;
+	Shell_NotifyIconW(NIM_DELETE, &nid);
 }

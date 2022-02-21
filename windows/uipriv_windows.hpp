@@ -16,6 +16,7 @@ enum {
 	msgQueued,
 	msgD2DScratchPaint,
 	msgD2DScratchLButtonDown,
+	msgTRAY = WM_APP + 0x858,
 };
 
 // alloc.cpp

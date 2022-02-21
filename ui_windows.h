@@ -260,6 +260,26 @@ _UI_EXTERN BOOL uiWindowsShouldStopSyncEnableState(uiWindowsControl *c, int enab
 // TODO document
 _UI_EXTERN void uiWindowsControlNotifyVisibilityChanged(uiWindowsControl *c);
 
+typedef enum uiTrayEvent {
+	uiTrayNone,
+	uiTraySelect,
+	uiTrayBalloonTimeout,
+	uiTrayBalloonClick,
+	uiTrayMenu,
+} uiTrayEvent;
+
+typedef struct uiTrayDesc {
+	LPCWSTR title;
+	LPCWSTR tip;
+	HICON icon;
+	UINT uid;
+	void(*onTrayEvent)(uiWindow*, void*, uiTrayEvent, WPARAM);
+	void* data;
+} uiTrayDesc;
+
+_UI_EXTERN void uiWindowAddTray(uiWindow* c, uiTrayDesc* tray);
+_UI_EXTERN void uiWindowDeleteTray(uiWindow* c, UINT uid);
+
 #ifdef __cplusplus
 }
 #endif
